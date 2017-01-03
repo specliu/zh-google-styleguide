@@ -1,7 +1,7 @@
 6. 命名约定
 ------------------
 
-最重要的一致性规则是命名管理. 命名风格快速获知名字代表是什么东东: 类型? 变量? 函数? 常量? 宏 ... ? 甚至不需要去查找类型声明. 我们大脑中的模式匹配引擎可以非常可靠的处理这些命名规则.
+命名规则是最重要的一致性规则. 通过命名风格可以快速获知名字代表是什么东东: 类型? 变量? 函数? 常量? 宏 ... ? 甚至不需要去查找类型声明. 我们大脑中的模式匹配引擎可以非常可靠的处理这些命名规则.
 
 命名规则具有一定随意性, 但相比按个人喜好命名, 一致性更重, 所以不管你怎么想, 规则总归是规则.
 
@@ -30,22 +30,23 @@
             int wgc_connections;       // 只有贵团队知道是啥意思。
             int pc_reader;             // "pc" 有太多可能的解释了。
             int cstmr_id;              // 有删减若干字母。
-
+  可以直接使用通用的缩写，比如用i命名用于迭代的变量，T用于模板类型参数
 6.2. 文件命名
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. tip::
 
-    文件名要全部小写, 可以包含下划线 (``_``) 或连字符 (``-``). 按项目约定来. 如果并没有项目约定，"_" 更好。
+    文件名要全部小写, 单词之间使用下划线 (``_``) 分隔。
 
     可接受的文件命名::
 
-        * my_useful_class.cc
-        * my-useful-class.cc
-        * myusefulclass.cc
-        * muusefulclass_test.cc // ``_unittest`` 和 ``_regtest`` 已弃用。
-
-    C++ 文件要以 ``.cc`` 结尾, 头文件以 ``.h`` 结尾. 专门插入文本的文件则以 ``.inc`` 结尾，参见:ref:`self-contained headers`。
+        * my_useful_class.cpp
+        * my-useful-class.cpp
+        * myusefulclass.cpp
+        * muusefulclass_test.cpp // ``_unittest`` 和 ``_regtest`` 已弃用。
+        * myUseFulClass.cc//不使用该风格
+        
+    C++ 文件要以 ``.cpp`` 结尾, 头文件以 ``.h`` 结尾. 专门插入文本的文件则以 ``.inc`` 结尾，参见:ref:`self-contained headers`。
 
     不要使用已经存在于 ``/usr/include`` 下的文件名 (Yang.Y 注: 即编译器搜索系统头文件的路径), 如 ``db.h``.
 
@@ -58,9 +59,9 @@
 
 .. tip::
 
-    类型名称的每个单词首字母均大写, 不包含下划线: ``MyExcitingClass``, ``MyExcitingEnum``.
+    类型名称的每个单词首字母均大写, 单词之间不包含下划线，比如: ``MyExcitingClass``, ``MyExcitingEnum``.
 
-所有类型命名 —— 类, 结构体, 类型定义 (``typedef``), 枚举 —— 均使用相同约定. 例如:
+所有类型命名 —— 类, 结构体, 类型别名 (``typedef``), 枚举，模板类型参数 —— 均使用该约定约定. 例如:
 
     .. code-block:: c++
 
@@ -80,7 +81,7 @@
 
 .. tip::
 
-    变量名一律小写, 单词之间用下划线连接. 类的成员变量以下划线结尾, 但结构体的就不用，如:: ``a_local_variable``, ``a_struct_data_member``, ``a_class_data_member_``.
+    变量名一律小写, 单词之间用下划线连接. 类的成员变量建议以下划线结尾(类成员变量一般为private，这样可以作为警示可能的泄漏), 但结构体的就不用，如:: ``a_local_variable``, ``a_struct_data_member``, ``a_class_data_member_``.
 
 普通变量命名:
 
@@ -220,12 +221,12 @@
 
 .. tip::
 
-    你并不打算:ref:`使用宏 <preprocessor-macros>`, 对吧? 如果你一定要用, 像这样命名: ``MY_MACRO_THAT_SCARES_SMALL_CHILDREN``.
+    你并不打算:ref:`使用宏 <preprocessor-macros>`, 对吧? 如果你一定要用, 像这样命名: ``MY_MACRO_THAT_SCARES_SMALL_CHILDREN``，这样其他元素的名称就不会意外的与宏名重复，导致意外的宏替换.
 
 参考:ref:`预处理宏 <preprocessor-macros>`; 通常 *不应该* 使用宏. 如果不得不用, 其命名像枚举命名一样全部大写, 使用下划线::
 
     #define ROUND(x) ...
-    #define PI_ROUNDED 3.0
+    #define PI_ROUNDED (3.0)
 
 6.10. 命名规则的特例
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
