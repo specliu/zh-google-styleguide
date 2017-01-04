@@ -1,9 +1,6 @@
 7. 注释
 ------------
-
-注释虽然写起来很痛苦, 但对保证代码可读性至关重要. 下面的规则描述了如何注释以及在哪儿注释. 当然也要记住: 注释固然很重要, 但最好的代码本身应该是自文档化. 有意义的类型名和变量名, 要远胜过要用注释解释的含糊不清的名字.
-
-你写的注释是给代码读者看的: 下一个需要理解你的代码的人. 慷慨些吧, 下一个人可能就是你!
+代码首先应该是设计者表达行为性知识的语言，其次才是来给计算机执行的，代码的可维护性至关重要，注释则是提升代码可维护性的关键工具. 下面的规则描述了如何注释以及在哪儿注释. 当然也要记住: 注释固然很重要, 但最好的代码本身应该是自文档化. 有意义的类型名和变量名, 要远胜过要用注释解释的含糊不清的名字.
 
 7.1. 注释风格
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -40,6 +37,21 @@
     通常, ``.h`` 文件要对所声明的类的功能和用法作简单说明. ``.cc`` 文件通常包含了更多的实现细节或算法技巧讨论,  如果你感觉这些实现细节或算法技巧讨论对于理解 ``.h`` 文件有帮助, 可以将该注释挪到 ``.h``, 并在 ``.cc`` 中指出文档在 ``.h``.
 
     不要简单的在 ``.h`` 和 ``.cc`` 间复制注释. 这种偏离了注释的实际意义.
+    
+    现定义头文件模板如下
+.. code-block:: c++
+
+    /************************************************************************
+    * 版权所有 (C)2008, 深圳市中兴通讯股份有限公司。
+    * 
+    * 作    者： 
+    * 其它说明： 
+    * 内容摘要：
+    * 
+    * 修改记录1：
+    *    修 改 人：
+    *    修改内容：
+    ************************************************************************/
 
 .. _class-comments:
 
@@ -85,26 +97,32 @@
         - 参数是否可以为 ``NULL``.
         - 是否存在函数使用上的性能隐患.
         - 如果函数是可重入的, 其同步前提是什么?
-
+        - 是否抛出异常,抛出什么异常??
+        
     举例如下:
 
         .. code-block:: c++
 
-            // Returns an iterator for this table.  It is the client's
-            // responsibility to delete the iterator when it is done with it,
-            // and it must not use the iterator once the GargantuanTable object
-            // on which the iterator was created has been deleted.
-            //
-            // The iterator is initially positioned at the beginning of the table.
-            //
-            // This method is equivalent to:
-            //    Iterator* iter = table->NewIterator();
-            //    iter->Seek("");
-            //    return iter;
-            // If you are going to immediately seek to another place in the
-            // returned iterator, it will be faster to use NewIterator()
-            // and avoid the extra seek.
-            Iterator* GetIterator() const;
+            /**
+             * Reads in a file containing a Sudoku puzzle.
+             * 
+             * @param dim
+             *            Dimension of puzzle. Requires: at most dim of 3, because
+             *            otherwise need different file format
+             * @param filename
+             *            of file containing puzzle. The file should contain one line
+             *            per row, with each square in the row represented by a digit,
+             *            if known, and a period otherwise. With dimension dim, the file
+             *            should contain dim*dim rows, and each row should contain
+             *            dim*dim characters.
+             * @return Sudoku object corresponding to file contents
+             * @throws Exception
+             *             if file reading encounters an error
+             * @throws ParseException
+             *             if file has error in its format
+             */
+            public static Sudoku fromFile(int dim, std::string filename) 
+            {...
 
     但也要避免罗罗嗦嗦, 或做些显而易见的说明. 下面的注释就没有必要加上 "returns false otherwise", 因为已经暗含其中了:
 
@@ -143,7 +161,7 @@
 
 全局变量:
 
-    和数据成员一样, 所有全局变量也要注释说明含义及用途. 比如:
+    和数据成员一样, 所有全局变量必须要注释说明含义及用途. 比如:
 
         .. code-block:: c++
 
@@ -198,7 +216,7 @@
 
 NULL, true/false, 1, 2, 3...:
 
-    向函数传入 ``NULL``, 布尔值或整数时, 要注释说明含义, 或使用常量让代码望文知意. 例如, 对比:
+    向函数传入 ``nullptr``, 布尔值或整数时, 要注释说明含义, 或使用常量让代码望文知意. 例如, 对比:
 
         .. warning::
             .. code-block:: c++
@@ -206,7 +224,7 @@ NULL, true/false, 1, 2, 3...:
                 bool success = CalculateSomething(interesting_value,
                                                   10,
                                                   false,
-                                                  NULL);  // What are these arguments??
+                                                  nullptr);  // What are these arguments??
 
 
     和:
@@ -216,7 +234,7 @@ NULL, true/false, 1, 2, 3...:
             bool success = CalculateSomething(interesting_value,
                                               10,     // Default base value.
                                               false,  // Not the first time we're calling this.
-                                              NULL);  // No callback.
+                                              nullptr);  // No callback.
 
     或使用常量或描述性变量:
 
@@ -283,6 +301,7 @@ NULL, true/false, 1, 2, 3...:
 仅仅标记接口为 ``DEPRECATED`` 并不会让大家不约而同地弃用，您还得亲自主动修正调用点（callsites），或是找个帮手。
 
 修正好的代码应该不会再涉及弃用接口点了，着实改用新接口点。如果您不知从何下手，可以找标记弃用注释的当事人一起商量。
+
 
 译者 (YuleFox) 笔记
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
