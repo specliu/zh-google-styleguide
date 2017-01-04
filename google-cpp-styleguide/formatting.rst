@@ -1,9 +1,8 @@
 8. 格式
 ------------
 
-代码风格和格式确实比较随意, 但一个项目中所有人遵循同一风格是非常容易的. 个体未必同意下述每一处格式规则, 但整个项目服从统一的编程风格是很重要的, 只有这样才能让所有人能很轻松的阅读和理解代码.
+代码风格和格式确实比较随意, 但一个项目中所有人遵循同一风格则可以让团队的开发效率大大提高提升. 个体未必同意下述每一处格式规则, 但整个项目服从统一的编程风格是很重要的, 只有这样才能让所有人能很轻松的阅读和理解代码.
 
-另外, 我们写了一个 `emacs 配置文件 <http://google-styleguide.googlecode.com/svn/trunk/google-c-style.el>`_ 来帮助你正确的格式化代码.
 
 .. _line-length:
 
@@ -56,7 +55,7 @@
 
 .. tip::
 
-    只使用空格, 每次缩进 2 个空格.
+    只使用空格, 每次缩进 4 个空格.
 
 我们使用空格缩进. 不要在代码中使用制符表. 你应该设置编辑器将制符表转为空格.
 
@@ -71,29 +70,32 @@
 
     .. code-block:: c++
 
-        ReturnType ClassName::FunctionName(Type par_name1, Type par_name2) {
+        ReturnType ClassName::FunctionName(Type par_name1, Type par_name2) 
+        {
             DoSomething();
             ...
         }
 
-如果同一行文本太多, 放不下所有参数:
+如果同一行文本太多, 放不下所有参数，则这样排版:
 
     .. code-block:: c++
 
         ReturnType ClassName::ReallyLongFunctionName(Type par_name1, Type par_name2,
-                                                     Type par_name3) {
+                                                     Type par_name3) 
+        {
             DoSomething();
             ...
         }
 
-甚至连第一个参数都放不下:
+甚至连第一个参数都放不下，则这样排版:
 
     .. code-block:: c++
 
         ReturnType LongClassName::ReallyReallyReallyLongFunctionName(
                 Type par_name1,  // 4 空格缩进
                 Type par_name2,
-                Type par_name3) {
+                Type par_name3) 
+        {
             DoSomething();  // 2 空格缩进
             ...
         }
@@ -129,19 +131,18 @@
     .. code-block:: c++
 
         // 接口中形参恒有命名。
-        class Shape {
-         public:
-          virtual void Rotate(double radians) = 0;
+        class Shape 
+        {
+            public:
+            virtual void Rotate(double radians) = 0;
         }
 
         // 声明中形参恒有命名。
-        class Circle : public Shape {
-         public:
-          virtual void Rotate(double radians);
+        class Circle : public Shape 
+        {
+            public:
+            virtual void Rotate(double radians);
         }
-
-        // 定义中注释掉无用变量。
-        void Circle::Rotate(double /*radians*/) {}
 
     .. warning::
 
@@ -199,14 +200,16 @@
 
         .. code-block:: c++
 
-            if (...) {
-              ...
-              ...
-              if (...) {
-                DoSomething(
-                    argument1, argument2,  // 4 空格缩进
-                    argument3, argument4);
-              }
+            if (...) 
+            {
+                ...
+                ...
+                if (...) 
+                {
+                    DoSomething(
+                               argument1, argument2,  // 4 空格缩进
+                               argument3, argument4);
+                }
 
     把多个参数放在同一行，是为了减少函数调用所需的行数，除非影响到可读性。有人认为把每个参数都独立成行，不仅更好读，而且方便编辑参数。不过，比起所谓的参数编辑，我们更看重可读性，且后者比较好办：
 
@@ -287,19 +290,25 @@
 
     .. code-block:: c++
 
-        if (condition) {  圆括号里没空格紧邻。
-          ...  // 2 空格缩进。
-        } else {  // else 与 if 的右括号同一行。
-          ...
+        if (condition) 
+        {  //圆括号里没空格紧邻。
+            ...  // 4 空格缩进。
+        }
+        else 
+        {  // else 与 if 的右括号同一行。
+            ...
         }
 
 如果你更喜欢在圆括号内部加空格:
 
     .. code-block:: c++
 
-        if ( condition ) {  // 圆括号与空格紧邻 - 不常见
-          ...  // 2 空格缩进。
-        } else {  // else 与 if 的右括号同一行。
+        if ( condition ) 
+        {  // 圆括号与空格紧邻 - 不常见
+            ...  // 4 空格缩进。
+        } 
+        else 
+        {  
           ...
         }
 
@@ -339,47 +348,22 @@
     .. code-block:: c++
 
         if (condition)
-          DoSomething();  // 2 空格缩进。
-
-        if (condition) {
-          DoSomething();  // 2 空格缩进。
+        {
+            DoSomething();  // 4 空格缩进。
         }
 
-但如果语句中某个 ``if-else`` 分支使用了大括号的话, 其它分支也必须使用:
-
-    .. warning::
-
-        .. code-block:: c++
-
-            // 不可以这样子 - IF 有大括号 ELSE 却没有。
-            if (condition) {
-                foo;
-            } else
-                bar;
-
-            // 不可以这样子 - ELSE 有大括号 IF 却没有。
-            if (condition)
-                foo;
-            else {
-                bar;
-            }
-
-
-    .. code-block:: c++
-
-        // 只要其中一个分支用了大括号，两个分支都要用上大括号。
-        if (condition) {
-          foo;
-        } else {
-          bar;
+        if (condition) 
+        {
+            DoSomething();  // 4 空格缩进。
         }
+
 
 8.9. 循环和开关选择语句
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. tip::
 
-    ``switch`` 语句可以使用大括号分段，以表明 cases 之间不是连在一起的。在单语句循环里，括号可用可不用。空循环体应使用 ``{}`` 或 ``continue``.
+    ``switch`` 语句必须使用大括号分段，以表明 cases 之间不是连在一起的。在单语句循环里，括号可用可不用。空循环体应使用 ``{}`` 或 ``continue``.
 
 ``switch`` 语句中的 ``case`` 块可以使用大括号也可以不用, 取决于你的个人喜好. 如果用的话, 要按照下文所述的方法.
 
@@ -387,28 +371,35 @@
 
     .. code-block:: c++
 
-        switch (var) {
-          case 0: {  // 2 空格缩进
-            ...      // 4 空格缩进
-            break;
-          }
-          case 1: {
-            ...
-            break;
-          }
-          default: {
-            assert(false);
-          }
+        switch (var)
+        {
+            case 0: 
+            {   
+                ...      // 4 空格缩进
+                break;
+            }
+            case 1: 
+            {
+                ...
+                break;
+            }
+            default: 
+            {
+                assert(false);
+            }
         }
 
-在单语句循环里，括号可用可不用：
+在单语句循环里，也必须使用花括号：
 
     .. code-block:: c++
 
         for (int i = 0; i < kSomeNumber; ++i)
-            printf("I love you\n");
-
-        for (int i = 0; i < kSomeNumber; ++i) {
+        {
+            printf("I love you\n");
+        }
+        
+        for (int i = 0; i < kSomeNumber; ++i) 
+        {
             printf("I take it back\n");
         }
 
@@ -416,7 +407,8 @@
 
     .. code-block:: c++
 
-        while (condition) {
+        while (condition) 
+        {
           // 反复循环直到条件失效。
         }
         for (int i = 0; i < kSomeNumber; ++i) {}  // 可 - 空循环体。
@@ -482,8 +474,9 @@
 
         if (this_one_thing > this_other_thing &&
             a_third_thing == a_fourth_thing &&
-            yet_another & last_one) {
-          ...
+            yet_another & last_one) 
+        {
+            ...
         }
 
 注意, 上例的逻辑与 (``&&``) 操作符均位于行尾. 这格式在 Google 里很常见，您要把所有操作符放在开头也可以。可以考虑额外插入圆括号, 合理使用的话对增强可读性是很有帮助的. 此外直接用符号形式的操作符，比如 ``&&`` 和 ``~``, 不要用词语形式的 ``and`` 和 ``compl``.
@@ -529,14 +522,15 @@
         int x{3};
         string name("Some Name");
         string name = "Some Name";
-        string name{"Some Name"};
-
-请务必小心列表初始化 {...} 用 ``std::initializer_list`` 构造函数初始化出的类型。非空列表初始化就会优先调用 ``std::initializer_list``, 不过空列表初始化除外，后者原则上会调用默认构造函数。为了强制禁用 ``std::initializer_list`` 构造函数，请改用括号。
+        string name{"Some Name"};
+        
+尽可能的使用列表初始化的形式来进行初始化操作，虽然列表初始化的操作机制有些复杂，但是其通用性以及对于narrow的限制使其成为最为便捷安全的初始化方式，除了在以下两种情况下:即使用auto推测类型以及明确的表明是调用具体的构造函数的时候。
 
     .. code-block:: c++
 
         vector<int> v(100, 1);  // A vector of 100 1s.
         vector<int> v{100, 1};  // A vector of 100, 1.
+        auto x0{1,2,3};//error,cannot deduce a type                
 
 此外，列表初始化不允许整型类型的四舍五入，这可以用来避免一些类型上的编程失误。
 
@@ -557,11 +551,12 @@
     .. code-block:: c++
 
         // 可 - directives at beginning of line
-          if (lopsided_score) {
+          if (lopsided_score) 
+          {
         #if DISASTER_PENDING      // 正确 -- 行开头起。
-            DropEverything();
+              DropEverything();
         #endif
-            BackToNormal();
+              BackToNormal();
           }
 
     .. warning::
@@ -569,7 +564,8 @@
         .. code-block:: c++
 
             // 差 - indented directives
-              if (lopsided_score) {
+              if (lopsided_score) 
+              {
                 #if DISASTER_PENDING  // 错了！ "#if" 应该放在行开头
                 DropEverything();
                 #endif                // 错了！ "#endif" 不要缩进
@@ -581,38 +577,41 @@
 
 .. tip::
 
-    访问控制块的声明依次序是 ``public:``, ``protected:``, ``private:``, 每次缩进 1 个空格.
+    访问控制块的声明依次序是 ``public:``, ``protected:``, ``private:``, 每次缩进 4 个空格.
 
 类声明 (对类注释不了解的话, 参考 :ref:`类注释 <class-comments>`) 的基本格式如下:
 
     .. code-block:: c++
 
-        class MyClass : public OtherClass {
-         public:      // 注意有 1 空格缩进!
-          MyClass();  // 照常，2 空格缩进。
-          explicit MyClass(int var);
-          ~MyClass() {}
+        class MyClass : public OtherClass 
+        {
+        public:      // 访问限制符与类括号对齐
+            MyClass();  // 照常，4 空格缩进。
+            explicit MyClass(int var);
+            ~MyClass() {}
 
-          void SomeFunction();
-          void SomeFunctionThatDoesNothing() {
-          }
+            void SomeFunction();
+            void SomeFunctionThatDoesNothing() 
+            {
+                ...
+            }
 
-          void set_some_var(int var) { some_var_ = var; }
-          int some_var() const { return some_var_; }
+            void set_some_var(int var) { some_var_ = var; }
+            int some_var() const { return some_var_; }
 
-         private:
-          bool SomeInternalFunction();
+        private:
+            bool SomeInternalFunction();
 
-          int some_var_;
-          int some_other_var_;
-          DISALLOW_COPY_AND_ASSIGN(MyClass);
+            int some_var_;
+            int some_other_var_;
+            DISALLOW_COPY_AND_ASSIGN(MyClass);
         };
 
 注意事项:
 
     - 所有基类名应在 80 列限制下尽量与子类名放在同一行.
 
-    - 关键词 ``public:``, ``protected:``, ``private:`` 要缩进 1 个空格.
+    - 关键词 ``public:``, ``protected:``, ``private:`` 直接对齐.
 
     - 除第一个关键词 (一般是 ``public``) 外, 其他关键词前要空一行. 如果类比较小的话也可以不空.
 
@@ -643,10 +642,11 @@
         // 如果要断成多行，缩进四格，冒号放在第一行初始化句：
         MyClass::MyClass(int var)
             : some_var_(var),             // 4 空格缩进
-              some_other_var_(var + 1) {  // 对准
-          ...
-          DoSomething();
-          ...
+              some_other_var_(var + 1) 
+        {  // 对齐
+            ...
+            DoSomething();
+            ...
         }
 
 8.17. 名字空间格式化
@@ -707,12 +707,13 @@
         int x[] = { 0 };  // 大括号内部可与空格紧邻也不可，不过两边都要加上。
         int x[] = {0};
         // 继承与初始化列表中的冒号前后恒有空格。
-        class Foo : public Bar {
-         public:
+        class Foo : public Bar 
+        {
+        public:
           // 至于内联函数实现，在大括号内部加上空格并编写实现。
-          Foo(int b) : Bar(), baz_(b) {}  // 大括号里面是空的话，不加空格。
-          void Reset() { baz_ = 0; }  // 用括号把大括号与实现分开。
-          ...
+            Foo(int b) : Bar(), baz_(b) {}  // 大括号里面是空的话，不加空格。
+            void Reset() { baz_ = 0; }  // 用括号把大括号与实现分开。
+            ...
 
     添加冗余的留白会给其他人编辑时造成额外负担. 因此, 行尾不要留空格. 如果确定一行代码已经修改完毕, 将多余的空格去掉; 或者在专门清理空格时去掉（确信没有其他人在处理). (Yang.Y 注: 现在大部分代码编辑器稍加设置后, 都支持自动删除行首/行尾空格, 如果不支持, 考虑换一款编辑器或 IDE)
 
@@ -720,20 +721,18 @@
 
     .. code-block:: c++
 
-        if (b) {          // if 条件语句和循环语句关键字后均有空格。
-        } else {          // else 前后有空格。
-        }
-        while (test) {}   // 圆括号内部不紧邻空格。
-        switch (i) {
-        for (int i = 0; i < 5; ++i) {
         switch ( i ) {    // 循环和条件语句的圆括号里可以与空格紧邻。
         if ( test ) {     // 圆括号，但这很少见。总之要一致。
-        for ( int i = 0; i < 5; ++i ) {
-        for ( ; i < 5 ; ++i) {  // 循环里内 ; 后恒有空格，； 前可以加个空格。
-        switch (i) {
-          case 1:         // switch case 的冒号前无空格。
+        for ( int i = 0; i < 5; ++i ) 
+        {...
+        for ( ; i < 5 ; ++i) 
+        {  // 循环里内 ; 后恒有空格，； 前可以加个空格。
+        
+        switch (i) 
+        {
+            case 1:         // switch case 的冒号前无空格。
             ...
-          case 2: break;  // 如果冒号有代码，加个空格。
+            case 2: break;  // 如果冒号有代码，加个空格。
 
 操作符:
 
@@ -765,9 +764,9 @@
         // 在类型与指针操作符之间留空格也可以，但要保持一致。
         vector<char *> x;
         set<list<string>> x;        // 在 C++11 代码里可以这样用了。
-        set<list<string> > x;       // C++03 中要在 > > 里留个空格。
-
-        // 您或许可以在 < < 里加上一对对称的空格。
+        set<list<string> > x;       // C++03 中要在 > > 里留个空格,C++11已经不需要
+        
+        // C++03下,您或许可以在 < < 里加上一对对称的空格。
         set< list<string> > x;
 
 8.19. 垂直留白
@@ -777,7 +776,7 @@
 
     垂直留白越少越好.
 
-这不仅仅是规则而是原则问题了: 不在万不得已, 不要使用空行. 尤其是: 两个函数定义之间的空行不要超过 2 行, 函数体首尾不要留空行, 函数体中也不要随意添加空行.
+这主要是规则问题而非原则问题: 不在万不得已, 不要使用空行. 尤其是: 两个函数定义之间的空行不要超过 2 行, 函数体首尾不要留空行, 函数体中也不要随意添加空行.
 
 基本原则是: 同一屏可以显示的代码越多, 越容易理解程序的控制流. 当然, 过于密集的代码块和过于疏松的代码块同样难看, 取决于你的判断. 但通常是垂直留白越少越好.
 
@@ -785,6 +784,7 @@
 
 * 函数体内开头或结尾的空行可读性微乎其微。
 * 在多重 if-else 块里加空行或许有点可读性。
+
 
 译者 (YuleFox) 笔记
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
