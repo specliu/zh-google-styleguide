@@ -8,7 +8,7 @@
 
 .. tip::
 
-    鼓励在 ``.cc`` 文件内使用匿名名字空间. 使用具名的名字空间时, 其名称可基于项目名或相对路径. 禁止使用 using 指示（using-directive）。禁止使用内联命名空间（inline namespace）。
+    在极少数情况下，将代码置于名字空间中，使用具名的名字空间时, 其名称可基于项目名或相对路径. 禁止使用 using 指示（using-directive）。禁止使用内联命名空间（inline namespace）。
 
 定义:
 
@@ -16,10 +16,10 @@
 
 优点:
 
-    虽然类已经提供了（可嵌套的）命名轴线 (YuleFox 注: 将命名分割在不同类的作用域内), 名字空间在这基础上又封装了一层.
+    名字空间提供了一种避免大型程序中名字冲突的方法，这样大部分代码可以合理的使用更小的名字。
 
-    举例来说, 两个不同项目的全局作用域都有一个类 ``Foo``, 这样在编译或运行时造成冲突. 如果每个项目将代码置于不同名字空间中, ``project1::Foo`` 和 ``project2::Foo`` 作为不同符号自然不会冲突.
-
+    举例来说, 两个不同项目的全局作用域都有一个类 ``Foo``, 这样在编译或运行时造成冲突. 如果每个项目将代码置于不同名字空间中, ``project1::Foo`` 和 ``project2::Foo`` 作为不同符号自然不会冲突。同一名字空间内不需要使用前缀就可以使用Foo。
+    
     内联命名空间会自动把内部的标识符放到外层作用域，比如：
 
     .. code-block:: c++
@@ -34,21 +34,95 @@
 
 缺点:
 
-    名字空间具有迷惑性, 因为它们和类一样提供了额外的 (可嵌套的) 命名轴线.
+    名字空间具有迷惑性, 其s使名字解析机制更为复杂(用什么都是有代价的)
+    
+    内联命名空间很容易令人迷惑，毕竟它们不再受其声明所在命名空间的限制。内联命名空间只在大型版本控制里有用。
 
-    命名空间很容易令人迷惑，毕竟它们不再受其声明所在命名空间的限制。内联命名空间只在大型版本控制里有用。
-
-    在头文件中使用匿名空间导致违背 C++ 的唯一定义原则 (One Definition Rule (ODR)).
-
+    在一些场合下需要重复的书写完整名称，如果名字在命名空间嵌套的很深，这会是很繁琐的事情。
+    
 结论:
 
     根据下文将要提到的策略合理使用命名空间.
+    
+    - 按照以下规范命名名字空间
+    - 按照下面例子中的方式在名字空间结束处加上注释
+    - 名字空间应该包含include语句后面的源代码
+    
+    .. code-block:: c++
+    
+        // In the .h file
+        namespace mynamespace 
+        {
+        // All declarations are within the namespace scope.
+        // Notice the lack of indentation.
+        class MyClass 
+        {
+        public:
+            ...
+            void Foo();
+        };
+        
+        }  // namespace mynamespace
+        
+        // In the .cpp file
+        namespace mynamespace 
+        {
 
+        // Definition of functions is within scope of the namespace.
+        void MyClass::Foo() 
+        {
+            ...
+        }
+        
+        }  // namespace mynamespace
+        
+        //更为复杂的.cpp文件会包含更多的细节，比如flags以及using-declaration
+        #include "a.h"
+
+        DEFINE_FLAG(bool, someflag, false, "dummy flag");
+
+        namespace a {
+
+        using ::foo::bar;
+
+        ...code for a...         // Code goes against the left margin.
+
+        }  // namespace a
+        
+    - 不要在"std"名字空间中声明名字，包括标准库内的类名，在命名空间"std"中声明名称会导致未定义的结果(??)，比如不可移植。通过引用头文件的形式引入
+    标准库中的内容
+    - 不要使用using-declaration来将名字空间的符号都引入进来
+    
+    .. warning:: c++
+        // Forbidden -- This pollutes the namespace.
+        using namespace foo;
+        
+    - 因为头文件中的名字空间会成为其对外声明的API的一部分，不要在头文件中进行名字空间重命名，除非名字空间被显性声明为内部使用
+    
+    .. code-block:: c++
+    
+        // Shorten access to some commonly used names in .cc files.    
+        namespace baz = ::foo::bar::baz;
+        // Shorten access to some commonly used names (in a .h file).
+        namespace librarian {
+        namespace impl {  // Internal, not part of the API.
+        namespace sidetable = ::pipeline_diagnostics::sidetable;
+        }  // namespace impl
+
+        inline void my_inline_function() {
+        // namespace alias local to a function (or method).
+        namespace baz = ::foo::bar::baz;
+        ...
+        }
+        }  // namespace librarian
+        
+    - 不要使用内联命名空间
+    
+    
 2.1.1. 匿名名字空间
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- 在 ``.cc`` 文件中, 允许甚至鼓励使用匿名名字空间, 以避免运行时的命名冲突:
-
+在 ``.cpp`` 文件中的符号为内部链接的时候可以使用匿名名字空间, 以避免运行时的命名冲突或将其声明为static,其不可使用在头文件中。
     .. code-block:: c++
 
         namespace {                             // .cc 文件中
@@ -61,7 +135,6 @@
 
 然而, 与特定类关联的文件作用域声明在该类中被声明为类型, 静态数据成员或静态成员函数, 而不是匿名名字空间的成员. 如上例所示, 匿名空间结束时用注释 ``// namespace`` 标识.
 
-- 不要在 ``.h`` 文件中使用匿名名字空间.
 
 2.1.2. 具名的名字空间
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -157,46 +230,16 @@
 
     - 禁止用内联命名空间
 
-2.2. 嵌套类
-~~~~~~~~~~~~~~~~~~
 
-.. tip::
 
-    当公有嵌套类作为接口的一部分时, 虽然可以直接将他们保持在全局作用域中, 但将嵌套类的声明置于:ref:`namespaces`内是更好的选择.
-
-定义: 在一个类内部定义另一个类; 嵌套类也被称为 *成员类 (member class)*.
-
-    .. code-block:: c++
-
-        class Foo {
-
-        private:
-            // Bar是嵌套在Foo中的成员类
-            class Bar {
-                …
-            };
-
-        };
-
-优点:
-
-    当嵌套 (或成员) 类只被外围类使用时非常有用; 把它作为外围类作用域内的成员, 而不是去污染外部作用域的同名类. 嵌套类可以在外围类中做前置声明, 然后在 ``.cc`` 文件中定义, 这样避免在外围类的声明中定义嵌套类, 因为嵌套类的定义通常只与实现相关.
-
-缺点:
-
-    嵌套类只能在外围类的内部做前置声明. 因此, 任何使用了 ``Foo::Bar*`` 指针的头文件不得不包含类 ``Foo`` 的整个声明.
-
-结论:
-
-    不要将嵌套类定义成公有, 除非它们是接口的一部分, 比如, 嵌套类含有某些方法的一组选项.
-
-2.3. 非成员函数、静态成员函数和全局函数
+2.2. 非成员函数、静态成员函数和全局函数
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. tip::
 
-    使用静态成员函数或名字空间内的非成员函数, 尽量不要用裸的全局函数.
-
+    尽可能将非成员函数放在名字空间里面，尽可能不使用全局函数，优先采用通过名字空间的方式将相关函数集中起来而不采用类的方式。
+    静态成员函数应该与类的实例以及类的静态成员数据密切相关。
+    
 优点:
 
     某些情况下, 非成员函数和静态成员函数是非常有用的, 将非成员函数放在名字空间内可避免污染全局作用域.
@@ -211,9 +254,30 @@
 
     定义在同一编译单元的函数, 被其他编译单元直接调用可能会引入不必要的耦合和链接时依赖; 静态成员函数对此尤其敏感. 可以考虑提取到新类中, 或者将函数置于独立库的名字空间内.
 
-    如果你必须定义非成员函数, 又只是在 ``.cc`` 文件中使用它, 可使用匿名:ref:`namespaces`或 ``static`` 链接关键字 (如 ``static int Foo() {...}``) 限定其作用域.
+    如果你必须定义非成员函数, 又只是在 ``.cpp`` 文件中使用它, 可使用匿名:ref:`namespaces`或 ``static`` 链接关键字 (如 ``static int Foo() {...}``) 限定其作用域.
+    
+    优先采用
+    
+    .. code-block:: c++
+        namespace myproject {
+        namespace foo_bar {
+            void Function1();
+            void Function2();
+        }  // namespace foo_bar
+        }  // namespace myproject
+        
+    而不是
+        
+    .. warning:: c++
+        namespace myproject {
+        class FooBar {
+        public:
+            static void Function1();
+            static void Function2();
+        };
+        }  // namespace myproject
 
-2.4. 局部变量
+2.3. 局部变量
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. tip::
@@ -261,7 +325,7 @@ C++ 允许在函数的任何位置声明变量. 我们提倡在尽可能小的�
             f.DoSomething(i);
         }
 
-2.5. 静态和全局变量
+2.4. 静态和全局变量
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. tip::
