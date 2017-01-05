@@ -42,8 +42,8 @@
 
 .. tip::
 
-    只在定义移动构造函数与移动赋值操作时使用右值引用. 不要使用 ``std::forward``.
-
+    只在定义移动构造函数，移动赋值操作以及perfect forwarding使用右值引用。
+    
 定义:
 
 	右值引用是一种只能绑定到临时对象的引用的一种, 其语法与传统的引用语法相似. 例如, ``void f(string&& s)``; 声明了一个其参数是一个字符串的右值引用的函数.
@@ -64,92 +64,9 @@
 	
 结论:
 
-	只在定义移动构造函数与移动赋值操作时使用右值引用, 不要使用 ``std::forward`` 功能函数. 你可能会使用 ``std::move`` 来表示将值从一个对象移动而不是复制到另一个对象. 
-
+	只在定义移动构造函数与移动赋值操作时使用右值引用, 以及与std::forward配合来实现perfect forwarding。 你可能会使用 ``std::move`` 来表示将值从一个对象移动而不是复制到另一个对象。
+	
 .. _function-overloading:
-
-5.3. 函数重载
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. tip::
-
-    若要用好函数重载，最好能让读者一看调用点（call site）就胸有成竹，不用花心思猜测调用的重载函数到底是哪一种。该规则适用于构造函数。
-
-定义:
-
-    你可以编写一个参数类型为 ``const string&`` 的函数, 然后用另一个参数类型为 ``const char*`` 的函数重载它:
-
-        .. code-block:: c++
-
-            class MyClass {
-                public:
-                void Analyze(const string &text);
-                void Analyze(const char *text, size_t textlen);
-            };
-
-优点:
-
-    通过重载参数不同的同名函数, 令代码更加直观. 模板化代码需要重载, 同时为使用者带来便利.
-
-缺点:
-
-    如果函数单单靠不同的参数类型而重载（acgtyrant 注：这意味着参数数量不变），读者就得十分熟悉 C++ 五花八门的匹配规则，以了解匹配过程具体到底如何。另外，当派生类只重载了某个函数的部分变体，继承语义容易令人困惑。
-
-结论:
-
-    如果您打算重载一个函数, 可以试试改在函数名里加上参数信息。例如，用 ``AppendString()`` 和 ``AppendInt()`` 等， 而不是一口气重载多个 ``Append()``.
-
-5.4. 缺省参数
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. tip::
-
-    我们不允许使用缺省函数参数，少数极端情况除外。尽可能改用函数重载。
-
-优点:
-
-    当您有依赖缺省参数的函数时，您也许偶尔会修改修改这些缺省参数。通过缺省参数，不用再为个别情况而特意定义一大堆函数了。与函数重载相比，缺省参数语法更为清晰，代码少，也很好地区分了「必选参数」和「可选参数」。
-
-缺点:
-
-    缺省参数会干扰函数指针，害得后者的函数签名（function signature）往往对不上所实际要调用的函数签名。即在一个现有函数添加缺省参数，就会改变它的类型，那么调用其地址的代码可能会出错，不过函数重载就没这问题了。此外，缺省参数会造成臃肿的代码，毕竟它们在每一个调用点（call site）都有重复（acgtyrant 注：我猜可能是因为调用函数的代码表面上看来省去了不少参数，但编译器在编译时还是会在每一个调用代码里统统补上所有默认实参信息，造成大量的重复）。函数重载正好相反，毕竟它们所谓的「缺省参数」只会出现在函数定义里。
-
-结论:
-
-    由于缺点并不是很严重，有些人依旧偏爱缺省参数胜于函数重载。所以除了以下情况，我们要求必须显式提供所有参数（acgtyrant 注：即不能再通过缺省参数来省略参数了）。
-
-    其一，位于 ``.cc`` 文件里的静态函数或匿名空间函数，毕竟都只能在局部文件里调用该函数了。
-
-    其二，可以在构造函数里用缺省参数，毕竟不可能取得它们的地址。
-
-    其三，可以用来模拟变长数组。
-
-        .. code-block:: c++
-
-            // 通过空 AlphaNum 以支持四个形参
-            string StrCat(const AlphaNum &a,
-                          const AlphaNum &b = gEmptyAlphaNum,
-                          const AlphaNum &c = gEmptyAlphaNum,
-                          const AlphaNum &d = gEmptyAlphaNum);
-
-5.5. 变长数组和 alloca()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. tip::
-
-    我们不允许使用变长数组和 ``alloca()``.
-
-优点:
-
-    变长数组具有浑然天成的语法. 变长数组和 ``alloca()`` 也都很高效.
-
-缺点:
-
-    变长数组和 ``alloca()`` 不是标准 C++ 的组成部分. 更重要的是, 它们根据数据大小动态分配堆栈内存, 会引起难以发现的内存越界 bugs: "在我的机器上运行的好好的, 发布后却莫名其妙的挂掉了".
-
-结论:
-
-    改用更安全的分配器（allocator），就像 ``std::vector`` 或 ``std::unique_ptr<T[]>``.
 
 5.6. 友元
 ~~~~~~~~~~~~~~~~
@@ -167,8 +84,8 @@
 
 .. tip::
 
-    我们不使用 C++ 异常.
-
+    我们不使用 C++ 异常(？？)，酌情的使用异常。
+    
 优点:
 
     - 异常允许应用高层决定如何处理在底层嵌套函数中「不可能发生」的失败（failures），不用管那些含糊且容易出错的错误代码（acgtyrant 注：error code, 我猜是Ｃ语言函数返回的非零 int 值）。
@@ -201,7 +118,7 @@
 
     我们并不是基于哲学或道德层面反对使用异常, 而是在实践的基础上. 我们希望在 Google 使用我们自己的开源项目, 但项目中使用异常会为此带来不便, 因此我们也建议不要在 Google 的开源项目中使用异常. 如果我们需要把这些项目推倒重来显然不太现实.
 
-    对于 Windows 代码来说, 有个 :ref:`特例 <windows-code>`.
+    对于 Windows 代码来说, 有个 :ref:`特例 <windows-code>`.??
 
 (YuleFox 注: 对于异常处理, 显然不是短短几句话能够说清楚的, 以构造函数为例, 很多 C++ 书籍上都提到当构造失败时只有异常可以处理, Google 禁止使用异常这一点, 仅仅是为了自身的方便, 说大了, 无非是基于软件管理成本上, 实际使用中还是自己决定)
 
@@ -277,20 +194,21 @@
 
 定义:
 
-    C++ 采用了有别于 C 的类型转换机制, 对转换操作进行归类.
-
+    C++ 采用了有别于 C 的类型转换机制, 对转换操作进行归类。
+    
 优点:
 
     C 语言的类型转换问题在于模棱两可的操作; 有时是在做强制转换 (如 ``(int)3.5``), 有时是在做类型转换 (如 ``(int)"hello"``). 另外, C++ 的类型转换在查找时更醒目.
-
+    C语言的类型转换非常的危险，C++的类型转换则要安全的多。
+    
 缺点:
 
-    恶心的语法.
+    恶心的语法.(个人见解)
 
 结论:
 
     不要使用 C 风格类型转换. 而应该使用 C++ 风格.
-
+	- 使用花括号的初始化方式(eg float f)
         - 用 ``static_cast`` 替代 C 风格的值转换, 或某个类指针需要明确的向上转换为父类指针时.
         - 用 ``const_cast`` 去掉 ``const`` 限定符.
         - 用 ``reinterpret_cast`` 指针类型和整型或其它指针之间进行不安全的相互转换. 仅在你对所做一切了然于心时使用.
@@ -302,53 +220,31 @@
 
 .. tip::
 
-    只在记录日志时使用流.
-
+    在适当的时机使用流，并只应用于简单的场合
+    
 定义:
-
-    流用来替代 ``printf()`` 和 ``scanf()``.
+    Streams are the standard I/O abstraction in C++, as exemplified by the standard header <iostream>. They are widely used in Google code, but only for debug logging and test diagnostics.
 
 优点:
+    The << and >> stream operators provide an API for formatted I/O that is easily learned, portable, reusable, and extensible. printf, by contrast, doesn't even support string, to say nothing of user-defined types, and is very difficult to use portably. printf also obliges you to choose among the numerous slightly different versions of that function, and navigate the dozens of conversion specifiers.
 
-    有了流, 在打印时不需要关心对象的类型. 不用担心格式化字符串与参数列表不匹配 (虽然在 gcc 中使用 ``printf`` 也不存在这个问题). 流的构造和析构函数会自动打开和关闭对应的文件.
+    Streams provide first-class support for console I/O via std::cin, std::cout, std::cerr, and std::clog. The C APIs do as well, but are hampered by the need to manually buffer the input.
 
 缺点:
-
-    流使得 ``pread()`` 等功能函数很难执行. 如果不使用 ``printf`` 风格的格式化字符串, 某些格式化操作 (尤其是常用的格式字符串 ``%.*s``) 用流处理性能是很低的. 流不支持字符串操作符重新排序 (%1s), 而这一点对于软件国际化很有用.
-
+    - Stream formatting can be configured by mutating the state of the stream. Such mutations are persistent, so the behavior of your code can be affected by the entire previous history of the stream, unless you go out of your way to restore it to a known state every time other code might have touched it. User code can not only modify the built-in state, it can add new state variables and behaviors through a registration system.
+    - It is difficult to precisely control stream output, due to the above issues, the way code and data are mixed in streaming code, and the use of operator overloading (which may select a different overload than you expect).
+    - The streams API is subtle and complex, so programmers must develop experience with it in order to use it effectively. However, streams were historically banned in Google code (except for logging and diagnostics), so Google engineers tend not to have that experience. Consequently, streams-based code is likely to be less readable and maintainable by Googlers than code based on more familiar abstractions.
+    - Resolving the many overloads of << is extremely costly for the compiler. When used pervasively in a large code base, it can consume as much as 20% of the parsing and semantic analysis time.
+    - The practice of building up output through chains of << operators interferes with internationalization, because it bakes word order into the code, and streams' support for localization is flawed.
+    
 结论:
+    Use streams only when they are the best tool for the job. This is typically the case when the I/O is ad-hoc, local, human-readable, and targeted at other developers rather than end-users. Be consistent with the code around you, and with the codebase as a whole; if there's an established tool for your problem, use that tool instead.
 
-    不要使用流, 除非是日志接口需要. 使用 ``printf`` 之类的代替.
+    Avoid using streams for I/O that faces external users or handles untrusted data. Instead, find and use the appropriate templating libraries to handle issues like internationalization, localization, and security hardening.
 
-    使用流还有很多利弊, 但代码一致性胜过一切. 不要在代码中使用流.
+    If you do use streams, avoid the stateful parts of the streams API (other than error state), such as imbue(), xalloc(), and register_callback(). Use explicit formatting functions rather than stream manipulators or formatting flags to control formatting details such as number base, precision, or padding.
 
-拓展讨论:
-
-    对这一条规则存在一些争论, 这儿给出点深层次原因. 回想一下唯一性原则 (Only One Way): 我们希望在任何时候都只使用一种确定的 I/O 类型, 使代码在所有 I/O 处都保持一致. 因此, 我们不希望用户来决定是使用流还是 ``printf + read/write``. 相反, 我们应该决定到底用哪一种方式. 把日志作为特例是因为日志是一个非常独特的应用, 还有一些是历史原因.
-
-    流的支持者们主张流是不二之选, 但观点并不是那么清晰有力. 他们指出的流的每个优势也都是其劣势. 流最大的优势是在输出时不需要关心打印对象的类型. 这是一个亮点. 同时, 也是一个不足: 你很容易用错类型, 而编译器不会报警. 使用流时容易造成的这类错误:
-
-        .. code-block:: c++
-
-            cout << this;   // 输出地址
-            cout << *this;  // 输出值
-
-    由于 ``<<`` 被重载, 编译器不会报错. 就因为这一点我们反对使用操作符重载.
-
-    有人说 ``printf`` 的格式化丑陋不堪, 易读性差, 但流也好不到哪儿去. 看看下面两段代码吧, 实现相同的功能, 哪个更清晰?
-
-        .. code-block:: c++
-
-            cerr << "Error connecting to '" << foo->bar()->hostname.first
-                 << ":" << foo->bar()->hostname.second << ": " << strerror(errno);
-
-            fprintf(stderr, "Error connecting to '%s:%u: %s",
-                    foo->bar()->hostname.first, foo->bar()->hostname.second,
-                    strerror(errno));
-
-    你可能会说, "把流封装一下就会比较好了", 这儿可以, 其他地方呢? 而且不要忘了, 我们的目标是使语言更紧凑, 而不是添加一些别人需要学习的新装备.
-
-    每一种方式都是各有利弊, "没有最好, 只有更适合". 简单性原则告诫我们必须从中选择其一, 最后大多数决定采用 ``printf + read/write``.
+    Overload << as a streaming operator for your type only if your type represents a value, and << writes out a human-readable string representation of that value. Avoid exposing implementation details in the output of <<; if you need to print object internals for debugging, use named functions instead (a method named DebugString() is the most common convention).
 
 5.11. 前置自增和自减
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -378,7 +274,7 @@
 
 .. tip::
 
-    我们强烈建议你在任何可能的情况下都要使用 ``const``. 此外有时改用 C++11 推出的 constexpr 更好。
+    我们强烈建议你在任何可能的情况下都要使用 ``const``. 有时改用 C++11 推出的 constexpr 更好。
 
 定义:
 
@@ -770,7 +666,7 @@
 
 定义：
 
-    Lambda 表达式是创建匿名函数对象的一种简易途径，常用于把函数当参数传，例如：
+    Lambda 表达式是创建匿名函数对象的一种简易途径，常用于把functor当参数传，例如：
 
     .. code-block:: c++
 
@@ -799,8 +695,29 @@
 
 5.22. 模板元编程
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    TODO
+    避免复杂的模板编程
+    
+Definition:
+    Template metaprogramming refers to a family of techniques that exploit the fact that the C++ template instantiation mechanism is Turing complete and can be used to perform arbitrary compile-time computation in the type domain.
 
+Pros:
+    Template metaprogramming allows extremely flexible interfaces that are type safe and high performance. Facilities like Google Test, std::tuple, std::function, and Boost.Spirit would be impossible without it.
+
+Cons:
+    The techniques used in template metaprogramming are often obscure to anyone but language experts. Code that uses templates in complicated ways is often unreadable, and is hard to debug or maintain.
+
+    Template metaprogramming often leads to extremely poor compiler time error messages: even if an interface is simple, the complicated implementation details become visible when the user does something wrong.
+
+    Template metaprogramming interferes with large scale refactoring by making the job of refactoring tools harder. First, the template code is expanded in multiple contexts, and it's hard to verify that the transformation makes sense in all of them. Second, some refactoring tools work with an AST that only represents the structure of the code after template expansion. It can be difficult to automatically work back to the original source construct that needs to be rewritten.    
+
+Decision:
+    Template metaprogramming sometimes allows cleaner and easier-to-use interfaces than would be possible without it, but it's also often a temptation to be overly clever. It's best used in a small number of low level components where the extra maintenance burden is spread out over a large number of uses.
+
+    Think twice before using template metaprogramming or other complicated template techniques; think about whether the average member of your team will be able to understand your code well enough to maintain it after you switch to another project, or whether a non-C++ programmer or someone casually browsing the code base will be able to understand the error messages or trace the flow of a function they want to call. If you're using recursive template instantiations or type lists or metafunctions or expression templates, or relying on SFINAE or on the sizeof trick for detecting function overload resolution, then there's a good chance you've gone too far.
+
+    If you use template metaprogramming, you should expect to put considerable effort into minimizing and isolating the complexity. You should hide metaprogramming as an implementation detail whenever possible, so that user-facing headers are readable, and you should make sure that tricky code is especially well commented. You should carefully document how the code is used, and you should say something about what the "generated" code looks like. Pay extra attention to the error messages that the compiler emits when users make mistakes. The error messages are part of your user interface, and your code should be tweaked as necessary so that the error messages are understandable and actionable from a user point of view.    
+    	
+    
 .. _boost:
 
 5.23. Boost 库
@@ -875,16 +792,98 @@
 
     C++11 相对于前身，复杂极了：1300 页 vs 800 页！很多开发者也不怎么熟悉它。于是从长远来看，前者特性对代码可读性以及维护代价难以预估。我们说不准什么时候采纳其特性，特别是在被迫依赖老实工具的项目上。
 
-    和 :ref:`boost` 一样，有些 C++11 扩展提倡实则对可读性有害的编程实践——就像去除冗余检查（比如类型名）以帮助读者，或是鼓励模板元编程等等。有些扩展在功能上与原有机制冲突，容易招致困惑以及迁移代价。
+    和 :ref:`boost` 一样，有些 C++11 扩展提倡实则对可读性有害的编程实践——就像去除冗余检查（比如类型名）以帮助读者，或是鼓励模板元编程等等。有些扩展在功能上与原有机制在功能上重复，招致困惑以及迁移代价。
 
 缺点：
 
     C++11 特性除了个别情况下，可以用一用。除了本指南会有不少章节会加以讨若干 C++11 特性之外，以下特性最好不要用：
 
-    - 尾置返回类型，比如用 ``auto foo() -> int`` 代替 ``int foo()``. 为了兼容于现有代码的声明风格。
     - 编译时合数 ``<ratio>``, 因为它涉及一个重模板的接口风格。
     - ``<cfenv>`` 和 ``<fenv.h>` 头文件，因为编译器尚不支持。
-    - 默认 lambda 捕获。
+    - 成员函数上的引用修饰符，比如X::Foo() & 或 void X::Foo() && ,这些特性比较古怪
+    
+Nonstandard Extensions
+------------------------
+Nonstandard extensions to C++ may not be used unless otherwise specified.
+
+Definition:
+    Compilers support various extensions that are not part of standard C++. Such extensions include GCC's __attribute__, intrinsic functions such as __builtin_prefetch, designated initializers (e.g. Foo f = {.field = 3}), inline assembly, __COUNTER__, __PRETTY_FUNCTION__, compound statement expressions (e.g. foo = ({ int x; Bar(&x); x }), variable-length arrays and alloca(), and the a?:b syntax.
+
+Pros:
+    - Nonstandard extensions may provide useful features that do not exist in standard C++. For example, some people think that designated initializers are more readable than standard C++ features like constructors.
+    - Important performance guidance to the compiler can only be specified using extensions.
+
+Cons:
+    - Nonstandard extensions do not work in all compilers. Use of nonstandard extensions reduces portability of code.
+    - Even if they are supported in all targeted compilers, the extensions are often not well-specified, and there may be subtle behavior differences between compilers.
+    - Nonstandard extensions add to the language features that a reader must know to understand the code.
+    
+Decision:
+    Do not use nonstandard extensions. You may use portability wrappers that are implemented using nonstandard extensions, so long as those wrappers are provided by a designated project-wide portability header.
+
+alias:
+------------
+Public aliases are for the benefit of an API's user, and should be clearly documented
+
+Definition:
+    There are several ways to create names that are aliases of other entities:
+    
+    .. codeblock::c++
+        typedef Foo Bar;
+        using Bar = Foo;
+        using other_namespace::Foo;
+    
+Like other declarations, aliases declared in a header file are part of that header's public API unless they're in a function definition, in the private portion of a class, or in an explicitly-marked internal namespace. Aliases in such areas or in .cc files are implementation details (because client code can't refer to them), and are not restricted by this rule.    
+
+Pros:
+    - Aliases can improve readability by simplifying a long or complicated name.
+    - Aliases can reduce duplication by naming in one place a type used repeatedly in an API, which might make it easier to change the type later.
+
+Cons:
+    - When placed in a header where client code can refer to them, aliases increase the number of entities in that header's API, increasing its complexity.
+    - Clients can easily rely on unintended details of public aliases, making changes difficult.
+    - It can be tempting to create a public alias that is only intended for use in the implementation, without considering its impact on the API, or on maintainability.
+    - Aliases can create risk of name collisions
+    - Aliases can reduce readability by giving a familiar construct an unfamiliar name
+    - Type aliases can create an unclear API contract: it is unclear whether the alias is guaranteed to be identical to the type it aliases, to have the same API, or only to be usable in specified narrow ways
+    
+Decision:
+    Don't put an alias in your public API just to save typing in the implementation; do so only if you intend it to be used by your clients.
+    
+    When defining a public alias, document the intent of the new name, including whether it is guaranteed to always be the same as the type it's currently aliased to, or whether a more limited compatibility is intended. This lets the user know whether they can treat the types as substitutable or whether more specific rules must be followed, and can help the implementation retain some degree of freedom to change the alias.
+    
+    Don't put namespace aliases in your public API    
+    
+    For example, these aliases document how they are intended to be used in client code:
+    
+    .. codeblock::c++
+        namespace a {
+        // Used to store field measurements. DataPoint may change from Bar* to some internal type.
+        // Client code should treat it as an opaque pointer.
+        using DataPoint = foo::bar::Bar*;
+
+        // A set of measurements. Just an alias for user convenience.
+        using TimeSeries = std::unordered_set<DataPoint, std::hash<DataPoint>, DataPointComparator>;
+        }  // namespace a
+        
+    These aliases don't document intended use, and half of them aren't meant for client use:
+    
+    .. codeblock::c++
+        namespace a {
+        // Bad: none of these say how they should be used.
+        using DataPoint = foo::bar::Bar*;
+        using std::unordered_set;  // Bad: just for local convenience
+        using std::hash;           // Bad: just for local convenience
+        typedef unordered_set<DataPoint, hash<DataPoint>, DataPointComparator> TimeSeries;
+        }  // namespace a    
+        
+    However, local convenience aliases are fine in function definitions, private sections of classes, explicitly marked internal namespaces, and in .cc files:
+    
+    .. codeblock::c++
+        // In a .cc file
+        using std::unordered_set;
+    
+
 
 译者（acgtyrant）笔记
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
