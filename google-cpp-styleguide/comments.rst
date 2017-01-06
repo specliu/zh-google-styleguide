@@ -34,9 +34,9 @@
 
     紧接着版权许可和作者信息之后, 每个文件都要用注释描述文件内容.
 
-    通常, ``.h`` 文件要对所声明的类的功能和用法作简单说明. ``.cc`` 文件通常包含了更多的实现细节或算法技巧讨论,  如果你感觉这些实现细节或算法技巧讨论对于理解 ``.h`` 文件有帮助, 可以将该注释挪到 ``.h``, 并在 ``.cc`` 中指出文档在 ``.h``.
+    通常, ``.h`` 文件要对所声明的类的功能和用法作简单说明. ``.cpp`` 文件通常包含了更多的实现细节或算法技巧讨论,  如果你感觉这些实现细节或算法技巧讨论对于理解 ``.h`` 文件有帮助, 可以将该注释挪到 ``.h``, 并在 ``.cpp`` 中指出文档在 ``.h``.
 
-    不要简单的在 ``.h`` 和 ``.cc`` 间复制注释. 这种偏离了注释的实际意义.
+    不要简单的在 ``.h`` 和 ``.cpp`` 间复制注释. 这种偏离了注释的实际意义.
     
     现定义头文件模板如下
 .. code-block:: c++
@@ -284,6 +284,7 @@ NULL, true/false, 1, 2, 3...:
 
         // TODO(kl@gmail.com): Use a "*" here for concatenation operator.
         // TODO(Zeke) change this to use relations.
+        // TODO(bug 12345): remove the "Last visitors" feature
 
 如果加 ``TODO`` 是为了在 "将来某一天做某事", 可以附上一个非常明确的时间 "Fix by November 2005"), 或者一个明确的事项 ("Remove this code when all clients can handle XML responses.").
 
