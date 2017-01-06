@@ -130,8 +130,8 @@
 
 .. tip::
 
-    我们禁止使用 RTTI.
-
+	除非别无选择才使用RTTI
+    
 定义:
 
     RTTI 允许程序员在运行时识别 C++ 类对象的类型. 它通过使用 ``typeid`` 或者 ``dynamic_cast`` 完成.
@@ -501,8 +501,8 @@
 
 .. tip::
 
-    用 ``auto`` 绕过烦琐的类型名，只要可读性好就继续用，别用在局部变量之外的地方。
-
+    当类型声明对于可读性没有什么帮助的时候，推荐使用auto，否则继续使用原来的模式。
+    
 定义：
 
     C++11 中，若变量被声明成 ``auto``, 那它的类型就会被自动匹配成初始化表达式的类型。您可以用 ``auto`` 来复制初始化或绑定引用。
@@ -820,6 +820,38 @@ Cons:
     
 Decision:
     Do not use nonstandard extensions. You may use portability wrappers that are implemented using nonstandard extensions, so long as those wrappers are provided by a designated project-wide portability header.
+
+std:hash
+----------------
+Do not define specializations of std::hash
+
+Definition:
+    std::hash<T> is the function object that the C++11 hash containers use to hash keys of type T, unless the user explicitly specifies a different hash function. For example, std::unordered_map<int, string> is a hash map that uses std::hash<int> to hash its keys, whereas std::unordered_map<int, string, MyIntHash> uses MyIntHash.
+
+    std::hash is defined for all integral, floating-point, pointer, and enum types, as well as some standard library types such as string and unique_ptr. Users can enable it to work for their own types by defining specializations of it for those types.
+    
+Pros:
+    std::hash is easy to use, and simplifies the code since you don't have to name it explicitly. Specializing std::hash is the standard way of specifying how to hash a type, so it's what outside resources will teach, and what new engineers will expect.
+
+Cons:
+    std::hash is hard to specialize. It requires a lot of boilerplate code, and more importantly, it combines responsibility for identifying the hash inputs with responsibility for executing the hashing algorithm itself. The type author has to be responsible for the former, but the latter requires expertise that a type author usually doesn't have, and shouldn't need. The stakes here are high because low-quality hash functions can be security vulnerabilities, due to the emergence of hash flooding attacks.
+
+    Even for experts, std::hash specializations are inordinately difficult to implement correctly for compound types, because the implementation cannot recursively call std::hash on data members. High-quality hash algorithms maintain large amounts of internal state, and reducing that state to the size_t bytes that std::hash returns is usually the slowest part of the computation, so it should not be done more than once.
+
+    Due to exactly that issue, std::hash does not work with std::pair or std::tuple, and the language does not allow us to extend it to support them.    
+    
+Decision:
+    You can use std::hash with the types that it supports "out of the box", but do not specialize it to support additional types. If you need a hash table with a key type that std::hash does not support, consider using legacy hash containers (e.g. hash_map) for now; they use a different default hasher, which is unaffected by this prohibition.
+
+    If you want to use the standard hash containers anyway, you will need to specify a custom hasher for the key type, e.g.    
+    
+    .. codeblock::c++
+    std::unordered_map<MyKeyType, Value, MyKeyTypeHasher> my_map;
+    
+    Consult with the type's owners to see if there is an existing hasher that you can use; otherwise work with them to provide one, or roll your own.
+    
+    We are planning to provide a hash function that can work with any type, using a new customization mechanism that doesn't have the drawbacks of std::hash.
+
 
 alias:
 ------------
